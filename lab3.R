@@ -47,301 +47,89 @@ data$bare.nuclei <- as.numeric(data$bare.nuclei)
 data$class <- as.numeric(data$class)
 
 #Se elimina la columna ID
-#dd$id <- NULL
 data$id <- NULL
 
 
-#VISTA GENERAL
-ggpairs(dd, aes(colour=class, alpha=0.4))
-
-
-#GRAFICO DE CORRELACION
-corrplot.mixed(cor(dd),
-               lower = "number", 
-               upper = "circle",
-               tl.col = "black")
-
-###########################################################################################
-
-
-library(ggpubr)
-library(FactoMineR)
-library(factoextra)
-
-
-data.sinclass = subset(data, select = -c(class) )
-PCA(data.sinclass[,-1],scale.unit=TRUE,ncp=5,graph=TRUE)
-dist = dist(data.sinclass,method='euclidean')
-
-
-fviz_dist(dist)
-
-
-
-#Metodo del codo
-fviz_nbclust(data.sinclass,kmeans,method="wss")
-
-#Metodo de la silueta
-fviz_nbclust(data.sinclass,kmeans,method="silhouette")
-
-#Metodo de la brecha estadistica
-fviz_nbclust(data.sinclass,kmeans,method="gap_stat")
-
-
-set.seed(999)
-
-km.res = kmeans(data.sinclass,5,nstart=25)
-fviz_cluster(km.res,data=data.sinclass,palette="jco",ggtheme=theme_minimal())
-
-classCluster = km.res$cluster
-kaka <- data 
-kaka$classCluster <- classCluster
-
-num = 0
-for (i in 1:nrow(kaka)) {
-  class = kaka$class[i]
-  classCluster = kaka$classCluster[i]
-  if(class ==2 && classCluster==5){
-    num = num + 1
-  }
-}
-num
-
-
-num = 0
-for (i in 1:nrow(kaka)) {
-  class = kaka$class[i]
-  classCluster = kaka$classCluster[i]
-  if(class ==4 && classCluster==5){
-    num = num + 1
-  }
-}
-
-data_frame <- data.frame(class=c(2,4),
-                         cluster=c(16,98))
-
-ggplot(data_frame,aes(x="",y=porcentaje, fill=categorias))+
-  geom_bar(stat = "identity",
-           color="white")+
-  geom_text(aes(label=percent(porcentaje/100)),
-            position=position_stack(vjust=0.5),color="white",size=6)+
-  coord_polar(theta = "y")+
-  scale_fill_manual(values=c("salmon","steelblue","orange","gray"))+
-  theme_void()+
-  labs(title="Gráfico de Pie")
-
-
-#Metodo de daisy
-dis.daisy = daisy(data.sinclass)
-dis.matrix.daisy = as.matrix(dis.daisy)
-ks.daisy = kmeans(dis.matrix.daisy,3)
-
-fviz_cluster(ks.daisy,data=data.sinclass,palette="jco",ggtheme=theme_minimal())
-
-#VALORES QUE CATALOGO DAISY
-ks.daisy$cluster
-
-
-p1 <- ggplot(data = data, aes(x = clump.thickness)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$clump.thickness),
-                            sd = sd(data$clump.thickness))) +
-  ggtitle("Histograma de clump.thickness") +
-  theme_bw()
-
-p2 <- ggplot(data = data, aes(x = unif.cell.size)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$unif.cell.size),
-                            sd = sd(data$unif.cell.size))) +
-  ggtitle("Histograma de unif.cell.size") +
-  theme_bw()
-
-p3 <- ggplot(data = data, aes(x = unif.cell.shape)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$unif.cell.shape),
-                            sd = sd(data$unif.cell.shape))) +
-  ggtitle("Histograma de unif.cell.shape") +
-  theme_bw()
-
-p4 <- ggplot(data = data, aes(x = marg.adhesion)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$marg.adhesion),
-                            sd = sd(data$marg.adhesion))) +
-  ggtitle("Histograma de marg.adhesion") +
-  theme_bw()
-
-p5 <- ggplot(data = data, aes(x = epith.cell.size)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$epith.cell.size),
-                            sd = sd(data$epith.cell.size))) +
-  ggtitle("Histograma de epith.cell.size") +
-  theme_bw()
-
-p6 <- ggplot(data = data, aes(x = bare.nuclei)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$bare.nuclei),
-                            sd = sd(data$bare.nuclei))) +
-  ggtitle("Histograma de bare.nuclei") +
-  theme_bw()
-
-p7 <- ggplot(data = data, aes(x = bland.chroma)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$bland.chroma),
-                            sd = sd(data$bland.chroma))) +
-  ggtitle("Histograma de bland.chroma") +
-  theme_bw()
-
-p8 <- ggplot(data = data, aes(x = norm.nucleoli)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$norm.nucleoli),
-                            sd = sd(data$norm.nucleoli))) +
-  ggtitle("Histograma de norm.nucleoli") +
-  theme_bw()
-
-p9 <- ggplot(data = data, aes(x = mitoses)) +
-  geom_histogram(aes(y = ..density.., fill = ..count..),bins=10) +
-  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
-  stat_function(fun = dnorm, colour = "firebrick",
-                args = list(mean = mean(data$mitoses),
-                            sd = sd(data$mitoses))) +
-  ggtitle("Histograma de mitoses") +
-  theme_bw()
-
-multiplot(p1, p2, p3, p4,p5,p6,p7,p8,p9, cols=3)
-
-#Pruebas de normalidad: https://rpubs.com/MSiguenas/122473
-
-#install.packages('moments')
-library(normtest)
-library(nortest)
-library(moments)
-
-
-#Anderson-Darling normality test
-for (i in names(data)) {
-  print(ad.test(data[[i]]))
-}
-
-###Prueba de Pearson chi-square###
-for (i in names(data)) {
-  print(pearson.test(data[[i]]))
-}
-
-###Prueba de Shapiro-Francia###
-for (i in names(data)) {
-  print(sf.test(data[[i]]))
-}
-
-###Prueba de Jarque Bera###
-for (i in names(data)) {
-  print(jb.norm.test(data[[i]]))
-}
-
-###Prueba de Shapiro-Wilk###
-for (i in names(data)) {
-  print(shapiro.test(data[[i]]))
-}
-
-
-#FUNCION DE INTERNET, HAY QUE ANEXARLA
-
-# Multiple plot function
-#
-# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-# - cols:   Number of columns in layout
-# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-#
-# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-# then plot 1 will go in the upper left, 2 will go in the upper right, and
-# 3 will go all the way across the bottom.
-#
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  library(grid)
-  
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-  
-  numPlots = length(plots)
-  
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  
-  if (numPlots==1) {
-    print(plots[[1]])
-    
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-
 ###########################################################################################
 ###########################################################################################
 ###########################################################################################
 
 
+library("ggpubr")
+library("cowplot")
+
+#install.packages("arulesViz")
+library("arulesViz")
+
+datos.rules <- dd
+
+datos.rules$id = NULL
+datos.rules$bare.nuclei = as.numeric(datos.rules$bare.nuclei)
+
+clump.thickness = c(0,4,7,10)
+clump.thickness.names = c("Bajo","Medio","Alto") 
+datos.rules$clump.thickness = cut(datos.rules$clump.thickness, breaks = clump.thickness, labels = clump.thickness.names)
+datos.rules$clump.thickness = factor(datos.rules$clump.thickness)
+
+unif.cell.size = c(0,4,7,10)
+unif.cell.size.names = c("Bajo","Medio","Alto")  
+datos.rules$unif.cell.size = cut(datos.rules$unif.cell.size, breaks = unif.cell.size, labels = unif.cell.size.names)
+datos.rules$unif.cell.size = factor(datos.rules$unif.cell.size)
+
+unif.cell.shape = c(0,4,7,10)
+unif.cell.shape.names = c("Bajo","Medio","Alto")  
+datos.rules$unif.cell.shape = cut(datos.rules$unif.cell.shape, breaks = unif.cell.shape, labels = unif.cell.shape.names)
+datos.rules$unif.cell.shape = factor(datos.rules$unif.cell.shape)
+
+marg.adhesion = c(0,4,7,10)
+marg.adhesion.names = c("Bajo","Medio","Alto")  
+datos.rules$marg.adhesion = cut(datos.rules$marg.adhesion, breaks = marg.adhesion, labels = marg.adhesion.names)
+datos.rules$marg.adhesion = factor(datos.rules$marg.adhesion)
+
+epith.cell.size = c(0,4,7,10)
+epith.cell.size.names = c("Bajo","Medio","Alto")  
+datos.rules$epith.cell.size = cut(datos.rules$epith.cell.size, breaks = epith.cell.size, labels = epith.cell.size.names)
+datos.rules$epith.cell.size = factor(datos.rules$epith.cell.size)
+
+bare.nuclei = c(0,4,7,10)
+bare.nuclei.names = c("Bajo","Medio","Alto")  
+datos.rules$bare.nuclei = cut(datos.rules$bare.nuclei, breaks = bare.nuclei, labels = bare.nuclei.names)
+datos.rules$bare.nuclei = factor(datos.rules$bare.nuclei)
+
+bland.chroma = c(0,4,7,10)
+bland.chroma.names = c("Bajo","Medio","Alto")  
+datos.rules$bland.chroma = cut(datos.rules$bland.chroma, breaks = bland.chroma, labels = bland.chroma.names)
+datos.rules$bland.chroma = factor(datos.rules$bland.chroma)
+
+norm.nucleoli = c(0,4,7,10)
+norm.nucleoli.names = c("Bajo","Medio","Alto")  
+datos.rules$norm.nucleoli = cut(datos.rules$norm.nucleoli, breaks = norm.nucleoli, labels = norm.nucleoli.names)
+datos.rules$norm.nucleoli = factor(datos.rules$norm.nucleoli)
+
+mitoses = c(0,4,7,10)
+mitoses.names = c("Bajo","Medio","Alto")  
+datos.rules$mitoses = cut(datos.rules$mitoses, breaks = mitoses, labels = mitoses.names)
+datos.rules$mitoses = factor(datos.rules$mitoses)
 
 
+rules.maligno = apriori(data = datos.rules,
+                parameter = list(support=0.1,minlen = 2, maxlen = 10, target="rules"),
+                appearance=list(rhs = c("class=Maligno"))
+                )
+filtered_rules.maligno <- subset(rules.maligno, subset = confidence > 0.95)
+
+summary(filtered_rules.maligno)
+inspect(sort(x=filtered_rules.maligno, decreasing = TRUE, by= "confidence"))
 
 
+rules.benigno = apriori(data = datos.rules,
+                parameter = list(support=0.5,minlen = 2, maxlen = 10, target="rules"),
+                appearance=list(rhs = c("class=Benigno"))
+)
 
+filtered_rules.benigno <- subset(rules.benigno, subset = confidence > 0.90)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+summary(filtered_rules.benigno)
+inspect(sort(x=filtered_rules.benigno, decreasing = TRUE, by= "confidence"))
 
 
